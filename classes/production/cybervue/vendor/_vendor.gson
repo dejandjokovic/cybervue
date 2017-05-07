@@ -1,0 +1,7 @@
+import cybervue.Vendor
+
+model {
+	Vendor vendor
+}
+
+json g.render(vendor)

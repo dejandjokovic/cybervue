@@ -1,0 +1,8 @@
+import cybervue.Software
+
+model {
+	Iterable<Software> softwareList
+}
+
+json tmpl.software(softwareList ?: [])
+

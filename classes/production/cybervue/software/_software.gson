@@ -1,0 +1,7 @@
+import cybervue.Software
+
+model {
+	Software software
+}
+
+json g.render(software)
