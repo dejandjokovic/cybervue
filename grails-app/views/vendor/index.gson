@@ -1,0 +1,8 @@
+import cybervue.Vendor
+
+model {
+	Iterable<Vendor> vendorList
+}
+
+json tmpl.vendor(vendorList ?: [])
+
