@@ -12,13 +12,17 @@ class BootStrap {
 //        microsoft.save()
 //        new Software(name: "Scoopz", version:"0.0.1").save()
 
+        // for MAC
+        //String fileName = "/import/vendors.xlsx"
 
-        String fileName = "/import/vendors.xlsx"
-        def vendorImportService = new VendorImportService(fileName)
+        // for PC
+        String fileNameExcel = "D:\\import\\vendors.xlsx"
 
-        def vendorList = vendorImportService.getVendors()
+        def vendorImportExcelService = new VendorImportExcelService(fileNameExcel)
 
-        vendorList.each { Map vendorParams ->
+        def vendorListFromExcel = vendorImportExcelService.getVendors()
+
+        vendorListFromExcel.each { Map vendorParams ->
             def newVendor = new Vendor(vendorParams)
             if (!newVendor.save()) {
                 println "Vendor not saved, errors = ${newVendor.errors}"

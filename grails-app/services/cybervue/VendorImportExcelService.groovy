@@ -6,22 +6,22 @@ import org.grails.plugins.excelimport.*
 import org.springframework.beans.factory.annotation.Autowired
 
 @Transactional
-class VendorImportService extends AbstractExcelImporter{
+class VendorImportExcelService extends AbstractExcelImporter {
 
     static scope = "prototype"
 
     static Map CONFIG_VENDOR_COLUMN_MAP = [
-            sheet:'Vendors',
-            startRow: 2,
-            columnMap:  [
-                    'A':'name',
-                    'B':'description',
-                    'C':'pointOfContactName',
-                    'D':'pointOfContactEmail'
+            sheet    : 'Vendors',
+            startRow : 1,
+            columnMap: [
+                    'A': 'name',
+                    'B': 'description',
+                    'C': 'pointOfContactName',
+                    'D': 'pointOfContactEmail'
             ]
     ]
 
-    VendorImportService(fileName){
+    VendorImportExcelService(fileName) {
         read(fileName)
     }
 
