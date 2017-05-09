@@ -12,6 +12,7 @@ class BootStrap {
 //        microsoft.save()
 //        new Software(name: "Scoopz", version:"0.0.1").save()
 
+
         // for MAC
         //String fileName = "/import/vendors.xlsx"
 
@@ -28,6 +29,32 @@ class BootStrap {
                 println "Vendor not saved, errors = ${newVendor.errors}"
             }
         }
+
+        UserRole.findAll().each{
+            it.delete(flush:true, failOnError:true)
+        }
+        User.findAll().each{
+            it.delete(flush:true, failOnError:true)
+        }
+        Role.findAll().each{
+            it.delete(flush:true, failOnError:true)
+        }
+
+        def adminRole = new Role(authority: 'ROLE_ADMIN').save()
+        def userRole = new Role(authority: 'ROLE_USER').save()
+
+        def testUser = new User(username: 'me', password: 'password').save()
+
+        UserRole.create testUser, adminRole
+
+        UserRole.withSession {
+            it.flush()
+            it.clear()
+        }
+
+        assert User.count() == 1
+        assert Role.count() == 2
+        assert UserRole.count() == 1
 
     }
     def destroy = {
