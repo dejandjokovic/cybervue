@@ -14,21 +14,21 @@ class BootStrap {
 
 
         // for MAC
-        //String fileName = "/import/vendors.xlsx"
+        //String fileNameExcel = "/import/vendors.xlsx"
 
         // for PC
-        String fileNameExcel = "D:\\import\\vendors.xlsx"
+        //String fileNameExcel = "D:\\import\\vendors.xlsx"
 
-        def vendorImportExcelService = new VendorImportExcelService(fileNameExcel)
+        //def vendorImportExcelService = new VendorImportExcelService(fileNameExcel)
 
-        def vendorListFromExcel = vendorImportExcelService.getVendors()
+        //def vendorListFromExcel = vendorImportExcelService.getVendors()
 
-        vendorListFromExcel.each { Map vendorParams ->
-            def newVendor = new Vendor(vendorParams)
-            if (!newVendor.save()) {
-                println "Vendor not saved, errors = ${newVendor.errors}"
-            }
-        }
+//        vendorListFromExcel.each { Map vendorParams ->
+//            def newVendor = new Vendor(vendorParams)
+//            if (!newVendor.save()) {
+//                println "Vendor not saved, errors = ${newVendor.errors}"
+//            }
+//        }
 
         UserRole.findAll().each{
             it.delete(flush:true, failOnError:true)

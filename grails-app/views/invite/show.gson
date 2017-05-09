@@ -1,0 +1,6 @@
+import cybervue.CyberVueInvite
+
+model {
+    CyberVueInvite invite
+}
+json tmpl.invite(invite)
