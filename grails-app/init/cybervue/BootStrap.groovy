@@ -30,31 +30,29 @@ class BootStrap {
 //            }
 //        }
 
-        UserRole.findAll().each{
-            it.delete(flush:true, failOnError:true)
-        }
-        User.findAll().each{
-            it.delete(flush:true, failOnError:true)
-        }
-        Role.findAll().each{
-            it.delete(flush:true, failOnError:true)
+        def adminRole = Role.findByAuthority("ROLE_ADMIN")
+        if(adminRole == null) {
+            adminRole = new Role(authority: 'ROLE_ADMIN').save(flush: true)
         }
 
-        def adminRole = new Role(authority: 'ROLE_ADMIN').save()
-        def userRole = new Role(authority: 'ROLE_USER').save()
-
-        def testUser = new User(username: 'me', password: 'password').save()
-
-        UserRole.create testUser, adminRole
-
-        UserRole.withSession {
-            it.flush()
-            it.clear()
+        def userRole = Role.findByAuthority("ROLE_USER")
+        if(userRole == null) {
+            userRole = new Role(authority: 'ROLE_USER').save(flush: true)
         }
 
-        assert User.count() == 1
-        assert Role.count() == 2
-        assert UserRole.count() == 1
+        def superAdmin = User.findByUsername("admin")
+        if(superAdmin == null) {
+            superAdmin = new User(username: 'admin', password: 'admin').save(flush: true)
+        }
+
+        def adminUserRelation = UserRole.findByUser(superAdmin)
+        if(adminUserRelation == null){
+            UserRole.create superAdmin, adminRole
+            UserRole.withSession {
+                it.flush()
+                it.clear()
+            }
+        }
 
     }
     def destroy = {

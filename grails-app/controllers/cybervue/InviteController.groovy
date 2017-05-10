@@ -7,6 +7,7 @@ import grails.transaction.Transactional
 import groovy.time.TimeCategory
 
 import static org.springframework.http.HttpStatus.CREATED
+import static org.springframework.http.HttpStatus.NOT_ACCEPTABLE
 import static org.springframework.http.HttpStatus.NOT_FOUND
 
 
@@ -15,12 +16,11 @@ import static org.springframework.http.HttpStatus.NOT_FOUND
 class InviteController {
 
     static responseFormats = ['json', 'xml']
-    static allowedMethods = [admin: "POST", submitted: "POST"]
+    static allowedMethods = [admin: "POST", user: "POST"]
 
     @Transactional
-    def admin(String email) {
-        def userEmail = "djdejan@gmail.com"
-        if (!userEmail) {
+    def admin(CyberVueInvite invite) {
+        if (invite == null) {
             transactionStatus.setRollbackOnly()
             render status: NOT_FOUND
             return
@@ -28,43 +28,55 @@ class InviteController {
 
         String confirmCode = UUID.randomUUID().toString()
         TimeZone.setDefault(TimeZone.getTimeZone('UTC'))
-        def now = new Date()
+        def validTo = new Date()
         use( TimeCategory ) {
-            now = now + 60.minutes
+            validTo = validTo + 60.minutes
         }
-        def invite = new CyberVueInvite(invitationEmail: userEmail, token: confirmCode, validTo: now)
+        def adminRole = Role.findByAuthority("ROLE_ADMIN")
+        invite.validTo = validTo
+        invite.token = confirmCode
+        invite.role = adminRole
         invite.save flush:true
 
         sendMail{
-            to userEmail
-            subject "CyberVue invitation"
-            text 'You have been invited to CyberVue portal. Please use this token ' + confirmCode + ' for creating password'
+            to invite.invitationEmail
+            subject "CyberVue admin invitation"
+            text 'Dear\r\n\r\n You have been invited to CyberVue portal. \r\n\r\n Please use this token ' + confirmCode + ' for creating password. \r\n\r\n Regards from CyberVue team.'
         }
 
         respond invite, [status: CREATED, view:"show"]
     }
 
     @Transactional
-    @Secured(['IS_AUTHENTICATED_ANONYMOUSLY'])
-    def submitted(CyberVueInvite invited){
-        if (invited == null) {
+    def user(CyberVueInvite invite) {
+        if (invite == null) {
             transactionStatus.setRollbackOnly()
             render status: NOT_FOUND
             return
         }
 
-        def invite = CyberVueInvite.findByToken(invited.token)
+        String confirmCode = UUID.randomUUID().toString()
+        TimeZone.setDefault(TimeZone.getTimeZone('UTC'))
+        def validTo = new Date()
+        use( TimeCategory ) {
+            validTo = validTo + 60.minutes
+        }
+        def userRole = Role.findByAuthority("ROLE_USER")
+        invite.validTo = validTo
+        invite.token = confirmCode
+        invite.role = userRole
+        invite.save flush:true
 
-        def user = new User(username: invite.invitationEmail, password: invited.password).save true
-        def adminRole = Role.findByAuthority("ROLE_ADMIN")
-
-        UserRole.create user, adminRole
-
-        UserRole.withSession {
-            it.flush()
-            it.clear()
+        sendMail{
+            to invite.invitationEmail
+            subject "CyberVue user invitation"
+            text 'Dear\r\n\r\n You have been invited to CyberVue portal. \r\n\r\n Please use this token ' + confirmCode + ' for creating password. \r\n\r\n Regards from CyberVue team.'
         }
 
-        respond user, [status: CREATED, view:"show"]
+        respond invite, [status: CREATED, view:"show"]
+    }
+
+    def show(CyberVueInvite invite) {
+        respond invite
     }
 }

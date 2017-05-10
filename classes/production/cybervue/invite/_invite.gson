@@ -1,0 +1,7 @@
+import cybervue.CyberVueInvite
+
+model {
+    CyberVueInvite invite
+}
+
+json g.render(invite)
